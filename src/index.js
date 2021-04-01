@@ -58,12 +58,37 @@ books = [
  The `book` parameter is an object representing a single book. 
 */
 function renderBook(book) {
-
+  const { title, rating, description, price, authors, quantity } = book;
+  const bookDiv = `
+    <div class="book">
+      <div class="details">
+        <div class="title">
+          ${title}
+          <span class="rating">(${rating})</span>
+        </div>
+        <div class="authors">by ${authors}</div>
+        <div class="description">
+          ${description}
+        </div>
+        <button class="removeBtn">Remove from cart</button>
+      </div>
+      <div class="quantity">${quantity} @ $${price}</div>
+      <div class="price">${quantity * price}</div>
+    </div>
+  `;
+  return bookDiv;
 }
 
 function calculateTotal() {
   // Calculate and return the total price of all items in the cart.
-
+  let cartTotal = 0;
+  if (books) {
+    books.forEach((book) => {
+      const { price, quantity } = book;
+      cartTotal += price * quantity;
+    });
+  }
+  return cartTotal;
 }
 
 /*
@@ -72,14 +97,25 @@ The books should be rendered in the `section` with id "cartItems".
 The total should be rendered in the `section` with id "cartTotal".
 */
 function render() {
+  let cartBooks;
+  if (books.length == 0) {
+    cartBooks = "Nothing in cart";
+  } else {
+    cartBooks = books.map(renderBook).join("");
+  }
+  const cartTotal = calculateTotal();
 
+  document.querySelector("#cartItems").innerHTML = cartBooks;
+  document.querySelector(".total-price").innerHTML = `$${cartTotal}`;
 }
 
 /*
   Sort the books array by price in ascending order then call render()
 */
 function sortByPrice() {
+  books.sort((bookA, bookB) => (bookA.price > bookB.price ? 1 : -1));
 
+  render();
 }
 
 /*
@@ -87,7 +123,10 @@ function sortByPrice() {
   then call render()
 */
 function main() {
+  const sortByPriceButton = document.querySelector("#sortBtn");
+  sortByPriceButton.addEventListener("click", sortByPrice);
 
+  render();
 }
 
 window.addEventListener("DOMContentLoaded", main);
